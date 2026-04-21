@@ -1,0 +1,5 @@
+# fyy-sandbox-images .trivyignore
+# Known vulnerabilities that are accepted in sandbox images
+
+# DL3008 - Pin versions in apt-get install (we use latest for system packages in slim images)
+# This is acceptable for sandbox images that are rebuilt regularly

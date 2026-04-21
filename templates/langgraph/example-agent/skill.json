@@ -1,0 +1,13 @@
+{
+  "name": "example-langgraph-agent",
+  "version": "0.1.0",
+  "description": "Example LangGraph agent for FYY sandbox",
+  "type": "agent",
+  "runtime": {
+    "language": "python",
+    "version": ">=3.11"
+  },
+  "entry": "main.py",
+  "skills": [],
+  "tags": ["example", "langgraph"]
+}

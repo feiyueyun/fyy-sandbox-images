@@ -8,14 +8,15 @@ FROM feiyueyun/fyy-sandbox:latest
 LABEL org.opencontainers.image.title="FYY Sandbox CrewAI"
 LABEL org.opencontainers.image.description="CrewAI framework with FYY CLI for distributed Agent workflows"
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    python3-venv \
-    && rm -rf /var/lib/apt/lists/*
+USER root
 
-# TODO: Install CrewAI when image is ready for release
-# RUN pip3 install crewai
+# Install CrewAI framework
+RUN pip3 install --no-cache-dir crewai crewai-tools
 
-WORKDIR /workspace
+# Copy example agent project
+COPY templates/crewai/example-agent/ /home/fyy/example-agent/
+RUN chown -R fyy:fyy /home/fyy/example-agent/
+
+USER fyy
+WORKDIR /home/fyy/example-agent
 CMD ["bash"]
