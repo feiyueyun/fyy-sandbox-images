@@ -11,6 +11,7 @@ Pre-built images with FYY CLI and popular Agent frameworks — ready to use with
 | Base | `latest` | fyy CLI + Python 3.12 + Node.js 22 LTS | amd64, arm64 |
 | CrewAI | `crewai` | CrewAI framework + fyy CLI + example agent | amd64, arm64 |
 | LangGraph | `langgraph` | LangGraph framework + fyy CLI + example agent | amd64, arm64 |
+| DeerFlow | `deer-flow` | DeerFlow multi-agent framework (LangGraph-based) + fyy CLI + example agent | amd64, arm64 |
 
 Versioned tags are also available (e.g. `v1.0.0`, `crewai-v1.0.0`).
 
@@ -26,6 +27,10 @@ docker run -it feiyueyun/fyy-sandbox:latest fyy network join --authkey=tskey-aut
 # Use a framework-specific image
 docker pull feiyueyun/fyy-sandbox:crewai
 docker run -it feiyueyun/fyy-sandbox:crewai
+
+# DeerFlow multi-agent framework
+docker pull feiyueyun/fyy-sandbox:deer-flow
+docker run -it feiyueyun/fyy-sandbox:deer-flow
 ```
 
 ## What's Inside
@@ -106,6 +111,9 @@ fyy-sandbox-images/
 │   ├── langgraph/
 │   │   ├── Dockerfile                 # LangGraph template
 │   │   └── example-agent/            # Example LangGraph agent
+│   ├── deer-flow/
+│   │   ├── Dockerfile                 # DeerFlow template
+│   │   └── example-agent/            # Example DeerFlow agent
 │   └── openclaw/
 │       └── Dockerfile                 # OpenClaw template (Phase 2)
 ├── scripts/

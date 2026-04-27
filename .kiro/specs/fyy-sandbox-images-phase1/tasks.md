@@ -36,7 +36,9 @@
 - [x] 5.2 创建 `templates/crewai/example-agent/`（main.py, requirements.txt, skill.json, README.md）
 - [x] 5.3 编写 `templates/langgraph/Dockerfile`
 - [x] 5.4 创建 `templates/langgraph/example-agent/`（main.py, requirements.txt, skill.json, README.md）
-- [ ] 5.5 OpenClaw 模板（Phase 2，不在 Phase 1 范围内）
+- [ ] 5.5 编写 `templates/deer-flow/Dockerfile`
+- [ ] 5.6 创建 `templates/deer-flow/example-agent/`（main.py, requirements.txt, skill.json, README.md）
+- [ ] 5.7 OpenClaw 模板（Phase 2，不在 Phase 1 范围内）
 
 ## 6. 框架模板验证
 
@@ -44,6 +46,8 @@
 - [x] 6.2 LangGraph 模板本地构建成功
 - [x] 6.3 CrewAI 冒烟测试通过（24/24）
 - [x] 6.4 LangGraph 冒烟测试通过（24/24）
+- [ ] 6.5 DeerFlow 模板本地构建成功
+- [ ] 6.6 DeerFlow 冒烟测试通过（框架可导入、示例项目完整）
 
 ## 7. CI/CD 流水线
 
@@ -71,6 +75,13 @@
 - [ ] 10.1 首次发布版本号确认
 - [ ] 10.2 GitHub Release 创建
 
+## 12. DeerFlow 模板镜像
+
+- [ ] 12.1 编写 `templates/deer-flow/Dockerfile`
+- [ ] 12.2 创建 `templates/deer-flow/example-agent/`（main.py, requirements.txt, skill.json, README.md）
+- [ ] 12.3 DeerFlow 模板本地构建成功
+- [ ] 12.4 DeerFlow 冒烟测试通过（langgraph + langchain 可导入、示例项目完整）
+
 ## 11. 多架构验证
 
 - [x] 11.1 CI 配置支持 linux/amd64 + linux/arm64
@@ -78,4 +89,4 @@
 
 ---
 
-**Phase 1 核心任务完成度：17/19（2 项可选任务未执行，2 项发布任务待 fyy v1.0-alpha 发布后执行）**
+**Phase 1 核心任务完成度：17/23（2 项可选任务未执行，2 项发布任务待 fyy v1.0-alpha 发布后执行，4 项 DeerFlow 新增任务待执行）**

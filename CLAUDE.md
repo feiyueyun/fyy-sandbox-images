@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-OCI container images for running AI Agents in sandboxed environments (飞越云 FYY Sandbox). The base image pre-installs the FYY CLI alongside Python 3.12 and Node.js 22 LTS. Framework-specific templates (CrewAI, LangGraph) layer on top of the base image.
+OCI container images for running AI Agents in sandboxed environments (飞越云 FYY Sandbox). The base image pre-installs the FYY CLI alongside Python 3.12 and Node.js 22 LTS. Framework-specific templates (CrewAI, LangGraph, DeerFlow) layer on top of the base image.
 
-Published to Docker Hub as `feiyueyun/fyy-sandbox` with tags: `latest`, `crewai`, `langgraph`, `openclaw`.
+Published to Docker Hub as `feiyueyun/fyy-sandbox` with tags: `latest`, `crewai`, `langgraph`, `deer-flow`, `openclaw`.
 
 **Status**: Pre-release. Images will be published when FYY CLI v1.0-alpha is released (2026 Q3). Framework template Dockerfiles currently have package installs commented out (`# TODO: Install ... when image is ready for release`).
 
@@ -19,6 +19,7 @@ docker build -t feiyueyun/fyy-sandbox:latest base/
 # Build a template image (requires base image to exist locally or in registry)
 docker build -t feiyueyun/fyy-sandbox:crewai -f templates/crewai/Dockerfile templates/crewai/
 docker build -t feiyueyun/fyy-sandbox:langgraph -f templates/langgraph/Dockerfile templates/langgraph/
+docker build -t feiyueyun/fyy-sandbox:deer-flow -f templates/deer-flow/Dockerfile templates/deer-flow/
 
 # Run base image
 docker run -it feiyueyun/fyy-sandbox:latest
@@ -34,6 +35,7 @@ python:3.12-slim
   └── base/Dockerfile → feiyueyun/fyy-sandbox:latest
         ├── templates/crewai/Dockerfile → feiyueyun/fyy-sandbox:crewai
         ├── templates/langgraph/Dockerfile → feiyueyun/fyy-sandbox:langgraph
+        ├── templates/deer-flow/Dockerfile → feiyueyun/fyy-sandbox:deer-flow
         └── templates/openclaw/Dockerfile → feiyueyun/fyy-sandbox:openclaw
 ```
 

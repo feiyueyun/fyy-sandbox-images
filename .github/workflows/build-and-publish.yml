@@ -182,7 +182,7 @@ jobs:
     if: github.event_name != 'pull_request'
     strategy:
       matrix:
-        template: [crewai, langgraph]
+        template: [crewai, langgraph, deer-flow]
     steps:
       - uses: actions/checkout@v4
 
@@ -254,7 +254,7 @@ jobs:
 
       - name: Sign template images
         run: |
-          for tag in crewai langgraph; do
+          for tag in crewai langgraph deer-flow; do
             cosign sign --yes "${{ env.IMAGE_NS }}:${tag}" || echo "WARNING: Failed to sign $tag"
           done
         continue-on-error: true

@@ -15,7 +15,7 @@ fyy-sandbox-images 是飞越云两层沙箱模型中层次一（Agent Runtime Sa
 ```
 层次一：Agent Runtime Sandbox（本仓库提供）
   ├── OCI 标准镜像，fyy CLI 预装
-  ├── 框架模板（crewai / langgraph）
+  ├── 框架模板（crewai / langgraph / deer-flow）
   └── 适配 8 种沙箱产品：E2B、Daytona、Devcontainer、Kata Containers、
       Firecracker、Docker/Podman、gVisor/runsc、Kubernetes RuntimeClass
 
@@ -38,7 +38,7 @@ fyy-sandbox-images ←── agent-interop-tests（可选镜像验证测试组�
 ### 阶段划分
 
 - **v1.0-alpha**：基础 OCI 镜像（feiyueyun/fyy-sandbox:latest）+ Dockerfile + CI 构建流水线
-- **v1.0-beta**：框架模板镜像（feiyueyun/fyy-sandbox:crewai、feiyueyun/fyy-sandbox:langgraph）
+- **v1.0-beta**：框架模板镜像（feiyueyun/fyy-sandbox:crewai、feiyueyun/fyy-sandbox:langgraph、feiyueyun/fyy-sandbox:deer-flow）
 - **v1.0（GA）**：所有镜像 Docker Hub 发布、Beta 反馈修复、文档完善
 
 ### 设计原则
@@ -291,6 +291,26 @@ fyy-sandbox-images ←── agent-interop-tests（可选镜像验证测试组�
 3. THE 仓库文档 SHALL 更新为 v1.0 正式版内容，包含完整的镜像列表、使用指南和故障排除说明
 4. THE 框架模板镜像中的示例 Agent 项目 SHALL 经过端到端验证：可成功启动、连接飞越云网络、安装和运行示例技能
 5. THE CI_Pipeline SHALL 在 v1.0 发布时启用 Cosign 镜像签名（REQ-6 交付）
+
+### REQ-17: DeerFlow 框架模板镜像（Phase 1 增量）
+
+**用户故事:** 作为使用 DeerFlow 框架的 Agent 开发者，我需要一个预装 DeerFlow 框架和 fyy CLI 的容器镜像，以便开箱即用地在沙箱环境中开发和运行 DeerFlow 多 Agent 工作流。
+
+#### 背景
+
+DeerFlow（`https://github.com/bytedance/deer-flow`）是字节跳动开源的长周期 SuperAgent 编排框架，基于 LangGraph 构建，支持多 Agent 协同、沙箱执行、记忆管理、工具调用和消息网关。DeerFlow 使用 Python 3.12+ 作为后端语言，FastAPI + uvicorn 作为 API 网关，Next.js (TypeScript) 作为前端 UI。核心依赖包括 `deerflow-harness`、`langgraph`、`langchain`、`langgraph-sdk`、`fastapi` 等。
+
+#### 验收标准
+
+1. THE Framework_Template_Image（`feiyueyun/fyy-sandbox:deer-flow`）SHALL 基于 Base_Image 构建，继承所有基础运行时环境
+2. THE DeerFlow 模板镜像 SHALL 预装 DeerFlow 框架核心 Python 依赖（`deerflow-harness`、`langgraph`、`langchain`、`langchain-core`、`langgraph-sdk`、`langgraph-cli` 等）
+3. THE DeerFlow 模板镜像 SHALL 包含一个可运行的示例 Agent 项目，位于 `/home/fyy/example-agent/` 目录
+4. THE 示例 Agent 项目 SHALL 包含以下文件：`main.py`（Agent 入口）、`requirements.txt`（Python 依赖声明）、`skill.json`（符合 skill-manifest-spec 标准的示例技能清单）、`README.md`（使用说明）
+5. THE 示例 Agent 项目 SHALL 默认配置自动连接飞越云官方控制平面（fyy CLI 默认行为）
+6. THE 示例 Agent 项目 SHALL 在连接官方控制平面后自动发现并安装 FYY Skills 官方技能服务（通过 tag:system-skill 标签自动识别，reference 模式安装），使 Agent 可通过标准技能发现机制感知飞越云平台能力
+7. THE 示例 Agent 项目 SHALL 包含 DeerFlow 框架与 fyy CLI 的集成示例代码，展示如何通过 fyy CLI 安装和调用技能
+8. THE DeerFlow 模板镜像 SHALL 通过 Smoke_Test 验证：DeerFlow 核心框架可导入（`python3 -c "import deerflow"` 返回退出码 0）、示例项目目录结构完整
+9. THE DeerFlow 模板镜像 SHALL 在 linux/amd64 和 linux/arm64 两种架构上均可构建和运行
 
 ### REQ-16: 正确性属性 — 镜像构建不变量验证
 

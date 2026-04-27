@@ -1,0 +1,13 @@
+{
+  "name": "example-deerflow-agent",
+  "version": "0.1.0",
+  "description": "Example DeerFlow agent for FYY sandbox — LangGraph-based multi-agent orchestration",
+  "type": "agent",
+  "runtime": {
+    "language": "python",
+    "version": ">=3.12"
+  },
+  "entry": "main.py",
+  "skills": [],
+  "tags": ["example", "deer-flow", "langgraph", "multi-agent"]
+}

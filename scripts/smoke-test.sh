@@ -5,6 +5,7 @@
 #   ./scripts/smoke-test.sh --image feiyueyun/fyy-sandbox:latest --type base
 #   ./scripts/smoke-test.sh --image feiyueyun/fyy-sandbox:crewai  --type crewai
 #   ./scripts/smoke-test.sh --image feiyueyun/fyy-sandbox:langgraph --type langgraph
+#   ./scripts/smoke-test.sh --image feiyueyun/fyy-sandbox:deer-flow --type deer-flow
 #
 # Exit codes:
 #   0 — all tests passed
@@ -26,11 +27,11 @@ TOTAL_COUNT=0
 # ---------------------------------------------------------------------------
 usage() {
     cat <<'EOF'
-Usage: smoke-test.sh --image <image:tag> --type <base|crewai|langgraph>
+Usage: smoke-test.sh --image <image:tag> --type <base|crewai|langgraph|deer-flow>
 
 Options:
   --image <image:tag>   Docker image to test (required)
-  --type <type>         Image type: base, crewai, langgraph (default: base)
+  --type <type>         Image type: base, crewai, langgraph, deer-flow (default: base)
   -h, --help            Show this help message
 EOF
     exit 1
@@ -200,6 +201,23 @@ test_langgraph_template() {
     run_test "Example agent skill.json exists" sh -c 'test -f /home/fyy/example-agent/skill.json'
 }
 
+test_deer_flow_template() {
+    echo ""
+    echo "=== DeerFlow Template Tests ==="
+
+    # Run all base tests first
+    test_base_image
+
+    # DeerFlow-specific tests (DeerFlow is built on LangGraph)
+    run_test "LangGraph framework importable (DeerFlow foundation)" python3 -c "import langgraph; print('langgraph ok')"
+    run_test "LangChain core importable" python3 -c "import langchain_core; print('langchain_core ok')"
+    run_test "FastAPI importable (DeerFlow gateway)" python3 -c "import fastapi; print('fastapi ok')"
+    run_test "Pydantic importable (DeerFlow data models)" python3 -c "import pydantic; print('pydantic ok')"
+    run_test "Example agent directory exists" sh -c 'test -d /home/fyy/example-agent'
+    run_test "Example agent main.py exists" sh -c 'test -f /home/fyy/example-agent/main.py'
+    run_test "Example agent skill.json exists" sh -c 'test -f /home/fyy/example-agent/skill.json'
+}
+
 # ---------------------------------------------------------------------------
 # Invariant verification (REQ-16)
 # ---------------------------------------------------------------------------
@@ -239,6 +257,10 @@ case "$TYPE" in
         ;;
     langgraph)
         test_langgraph_template
+        test_invariants
+        ;;
+    deer-flow)
+        test_deer_flow_template
         test_invariants
         ;;
     *)

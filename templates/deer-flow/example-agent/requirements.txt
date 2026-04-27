@@ -1,0 +1,16 @@
+# DeerFlow core runtime dependencies
+# Compatible with https://github.com/bytedance/deer-flow
+langgraph>=1.0.6,<1.0.10
+langchain>=1.2.3
+langchain-core
+langchain-mcp-adapters>=0.1.0
+langgraph-sdk>=0.1.51
+langgraph-cli>=0.4.14
+langgraph-runtime-inmem>=0.22.1
+langgraph-checkpoint-sqlite>=3.0.3
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+httpx>=0.28.0
+pydantic>=2.12.5
+pyyaml>=6.0.3
+tiktoken>=0.8.0

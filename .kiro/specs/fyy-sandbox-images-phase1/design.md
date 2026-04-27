@@ -7,7 +7,7 @@
 ### 设计目标
 
 1. 提供最小化、安全的基础 OCI 镜像（Base Image），预装 fyy CLI + Python 3.12 + Node.js 22 LTS
-2. 支持 CrewAI 和 LangGraph 两种框架模板镜像，基于 Base Image 构建
+2. 支持 CrewAI、LangGraph 和 DeerFlow 三种框架模板镜像，基于 Base Image 构建
 3. 实现完整的 CI/CD 流水线：多架构构建 → 冒烟测试 → 安全扫描 → Docker Hub 发布 → 镜像签名
 4. 确保镜像兼容 8 种目标沙箱运行时（Docker、Podman、containerd、gVisor 等）
 
@@ -35,6 +35,13 @@ fyy-sandbox-images/
 │           ├── requirements.txt
 │           ├── skill.json
 │           └── README.md
+│   └── deer-flow/
+│       ├── Dockerfile               # DeerFlow 模板镜像 Dockerfile
+│       └── example-agent/           # DeerFlow 示例 Agent 项目
+│           ├── main.py
+│           ├── requirements.txt
+│           ├── skill.json
+│           └── README.md
 ├── scripts/
 │   ├── smoke-test.sh                # 冒烟测试脚本
 │   └── fetch-fyy-binary.sh          # fyy CLI 二进制获取脚本
@@ -54,6 +61,7 @@ graph TD
     A["debian:bookworm-slim"] --> B["feiyueyun/fyy-sandbox:latest<br/>(Base Image)"]
     B --> C["feiyueyun/fyy-sandbox:crewai<br/>(CrewAI Template)"]
     B --> D["feiyueyun/fyy-sandbox:langgraph<br/>(LangGraph Template)"]
+    B --> E["feiyueyun/fyy-sandbox:deer-flow<br/>(DeerFlow Template)"]
 
     subgraph "Base Image 内容"
         B1["fyy CLI binary"]
@@ -72,6 +80,11 @@ graph TD
     subgraph "LangGraph Template 增量"
         D1["langgraph Python 包"]
         D2["示例 Agent 项目"]
+    end
+
+    subgraph "DeerFlow Template 增量"
+        E1["deerflow-harness + langgraph<br/>langchain + langgraph-sdk"]
+        E2["示例 Agent 项目"]
     end
 ```
 
@@ -175,6 +188,29 @@ USER fyy
 WORKDIR /home/fyy/example-agent
 ```
 
+**DeerFlow 模板（`templates/deer-flow/Dockerfile`）：**
+```dockerfile
+FROM feiyueyun/fyy-sandbox:latest
+USER root
+COPY example-agent/ /home/fyy/example-agent/
+RUN pip3 install --no-cache-dir \
+    langgraph>=1.0.6,<1.0.10 \
+    langchain>=1.2.3 \
+    langchain-core \
+    langgraph-sdk>=0.1.51 \
+    langgraph-cli>=0.4.14 \
+    langgraph-runtime-inmem>=0.22.1 \
+    fastapi>=0.115.0 \
+    uvicorn[standard]>=0.34.0 \
+    httpx>=0.28.0 \
+    pydantic>=2.12.5 \
+    && chown -R fyy:fyy /home/fyy/example-agent/
+USER fyy
+WORKDIR /home/fyy/example-agent
+```
+
+> **设计决策：** DeerFlow 模板安装 LangGraph 和 LangChain 核心包而非 `deerflow-harness`（后者需要 uv workspace 构建，不适合直接 pip install）。模板提供与 DeerFlow 兼容的 LangGraph 运行时环境，用户可在容器内通过 `uv` 或 `pip` 安装完整的 DeerFlow 项目依赖。
+
 ### 3. fyy CLI 二进制获取脚本（`scripts/fetch-fyy-binary.sh`）
 
 接口：
@@ -228,6 +264,7 @@ WORKDIR /home/fyy/example-agent
 额外测试项（框架模板）：
 - CrewAI：`python3 -c "import crewai"` 退出码 0，`/home/fyy/example-agent/` 目录完整
 - LangGraph：`python3 -c "import langgraph"` 退出码 0，`/home/fyy/example-agent/` 目录完整
+- DeerFlow：`python3 -c "import langgraph"` 退出码 0，`python3 -c "import langchain"` 退出码 0，`/home/fyy/example-agent/` 目录完整
 
 不变量验证（REQ-16）：
 - fyy CLI 版本一致性：`fyy --version` 输出与 `FYY_VERSION` 构建参数一致
@@ -304,6 +341,8 @@ GitHub Actions 权限：
 | `v{X.Y.Z}` | `feiyueyun/fyy-sandbox:v1.0.0` | tag v* | Base Image 指定版本 |
 | `{framework}` | `feiyueyun/fyy-sandbox:crewai` | push main / tag v* | 框架模板最新版 |
 | `{framework}-v{X.Y.Z}` | `feiyueyun/fyy-sandbox:crewai-v1.0.0` | tag v* | 框架模板指定版本 |
+| `{framework}` | `feiyueyun/fyy-sandbox:deer-flow` | push main / tag v* | DeerFlow 模板最新版 |
+| `{framework}-v{X.Y.Z}` | `feiyueyun/fyy-sandbox:deer-flow-v1.0.0` | tag v* | DeerFlow 模板指定版本 |
 
 ### 示例 Agent 项目 skill.json 结构
 
@@ -399,7 +438,7 @@ Trivy 扫描参数：
 
 ### Property 6: 框架模板继承完整性
 
-*For any* Framework_Template_Image (crewai, langgraph), the outputs of `fyy --version`, `python3 --version`, and `node --version` SHALL be identical to the corresponding outputs in the Base_Image it was built from.
+*For any* Framework_Template_Image (crewai, langgraph, deer-flow), the outputs of `fyy --version`, `python3 --version`, and `node --version` SHALL be identical to the corresponding outputs in the Base_Image it was built from.
 
 **Validates: Requirements 16.2**
 
@@ -528,7 +567,7 @@ Tag 格式：`Feature: fyy-sandbox-images-phase1, Property {number}: {property_t
 | 测试类型 | 执行时机 | 阻塞发布 | 覆盖 REQ |
 |----------|---------|---------|---------|
 | 冒烟测试（Base Image） | 每次构建 | 是 | 1, 8, 9, 16 |
-| 冒烟测试（模板镜像） | 非 PR 构建 | 是 | 10, 11, 16 |
+| 冒烟测试（模板镜像） | 非 PR 构建 | 是 | 10, 11, 16, 17 |
 | Trivy 安全扫描 | 每次构建 | 否（仅报告） | 5 |
 | 属性测试（SHA256 校验） | 每次构建 | 是 | 2 |
 | 集成测试（Docker Hub） | 非 PR 构建 | 是 | 12 |
