@@ -1,6 +1,6 @@
 # FYY Sandbox Images
 
-OCI container images for running AI Agents in sandboxed environments.
+OCI container images for running AI Agents in sandboxed environments — part of the FYY decentralized skill marketplace.
 
 Pre-built images with FYY CLI and popular Agent frameworks — ready to use with any OCI-compatible runtime (Docker, Podman, containerd, gVisor, Kata Containers, and more).
 
